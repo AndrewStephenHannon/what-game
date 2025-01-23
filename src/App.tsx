@@ -4,8 +4,6 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
- //const [count, setCount] = useState(0)
-
   const [result, setResult] = useState("");
 
   fetch('https://fqs02u8rtj.execute-api.us-east-1.amazonaws.com/default/testFunction')
