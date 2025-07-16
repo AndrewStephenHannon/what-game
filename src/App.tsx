@@ -1,38 +1,41 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
-function App() {
-  const [result, setResult] = useState("");
+interface Recommendation {
+  game: string;
+  suggestions:[string];
+}
 
-  fetch('https://fqs02u8rtj.execute-api.us-east-1.amazonaws.com/default/testFunction')
+function App() {
+  const [result, setResult] = useState<Recommendation>();
+
+  useEffect(() => {
+    fetch('https://627zcva05h.execute-api.us-east-1.amazonaws.com/default/recommendGame')
    .then(response => response.json())
    .then(data => setResult(data))
    .catch(error => console.error(error));
+  },
+  []);
+
+  /*const fetchData = async () => { 
+      const response = await fetch('https://627zcva05h.execute-api.us-east-1.amazonaws.com/default/recommendGame')
+      const data = await response.json()
+      return data
+   }
+  
+  console.log(fetchData())*/
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
       <div className="card">
-        <button>
-          count is {result}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+        <h1>{result?.game}</h1>
+        <br></br>
+        {result?.suggestions.map((suggestion) => <button>{suggestion}</button>)}
+        
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   )
 }
