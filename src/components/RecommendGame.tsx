@@ -6,27 +6,44 @@ interface Recommendation {
 }
 
 function RecommendGame() {
-  const [result, setResult] = useState<Recommendation>();
+    const [result, setResult] = useState<Recommendation>();
+    const [gameHistory, setGameHistory] = useState<{ game: string, reason: string }[]>([]);
 
-  useEffect(() => {
-    fetch('https://627zcva05h.execute-api.us-east-1.amazonaws.com/default/recommendGame')
-   .then(response => response.json())
-   .then(data => setResult(data))
-   .catch(error => console.error(error));
-  },
-  []);
+    const handleClick = (suggestion: string) => {
+        if(result?.game)
+            setGameHistory(prev => [...prev, {game: result.game, reason: suggestion}])
+    }
 
-  return (
-    <>
-      <div className="card">
+    useEffect(() => {
+        const endpoint = gameHistory.length > 0 ?
+            'https://wg8nxxcksi.execute-api.us-east-1.amazonaws.com/default/refineGame':
+            'https://627zcva05h.execute-api.us-east-1.amazonaws.com/default/recommendGame'
 
-        <h1>{result?.game}</h1>
-        <br></br>
-        {result?.suggestions.map((suggestion) => <button key={suggestion}>{suggestion}</button>)}
-        
-      </div>
-    </>
-  )
+        const payload = gameHistory.length > 0 ? { history: gameHistory } : undefined;
+
+        const method = gameHistory.length > 0 ? 'POST' : 'GET'
+
+        fetch(endpoint, {
+            method: method,
+            body: payload ? JSON.stringify(payload) : undefined
+        })
+    .then(response => response.json())
+    .then(data => setResult(data))
+    .catch(error => console.error(error));
+    },
+    [gameHistory]);
+
+    return (
+        <>
+            <div className="card">
+
+            <h1>{result?.game}</h1>
+            <br></br>
+            {result?.suggestions.map((suggestion) => <button key={suggestion} onClick= {() => handleClick(suggestion)}>{suggestion}</button>)}
+            
+            </div>
+        </>
+    )
 }
 
 export default RecommendGame
